@@ -11,7 +11,7 @@ Use admin token from `.env` to create the first workspace/admin via API:
 curl -X POST \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer <ADMIN_TOKEN>" \
-  -d '{"email":"admin@ghoststack.local","password":"Admin2026!"}' \
+  -d '{"email":"admin@example.com","password":"<change-me>"}' \
   http://127.0.0.1:8081/api/users/
 ```
 

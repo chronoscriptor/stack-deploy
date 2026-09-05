@@ -8,7 +8,7 @@
 | Admin user | `admin` |
 | Admin password | Stored in `.env` (chmod 600) |
 | API user | `api-agent` (type: api) |
-| API key | `35a608cd4f163e9a85cfa1d6604f3c6e` |
+| API key | Generated per install — stored in `.env` |
 | API key auth | Header `X-Api-Key: <key>` |
 | DB | MariaDB 10.11 (internal, port 3306) |
 | Network | `agent-shared-net` + connected to `n8n_n8n-net` |
@@ -25,7 +25,7 @@ curl -u "admin:<password>" http://127.0.0.1:3001/api/v1/Account
 
 **As API user (recommended for agents):**
 ```bash
-curl -H "X-Api-Key: 35a608cd4f163e9a85cfa1d6604f3c6e" http://127.0.0.1:3001/api/v1/Account
+curl -H "X-Api-Key: <api-key-from-env>" http://127.0.0.1:3001/api/v1/Account
 ```
 
 ### API users
@@ -41,7 +41,7 @@ curl -H "X-Api-Key: 35a608cd4f163e9a85cfa1d6604f3c6e" http://127.0.0.1:3001/api/
 - **Name:** EspoCRM Agent Access
 - **Type:** espoCRMApi
 - **URL:** `http://agent-default-crm:80` (Docker internal)
-- **API Key:** `35a608cd4f163e9a85cfa1d6604f3c6e`
+- **API Key:** Stored in n8n credential (not in this repo)
 
 ### Test Workflow
 - **Name:** EspoCRM Test - Create Account
@@ -63,7 +63,6 @@ curl -X POST -H "Content-Type: application/json" \
 
 ## Secrets
 - `.env` (chmod 600) — DB + admin credentials
-- `.env.template` — Placeholder template
 
 ## Network
 - Container is dual-homed: `agent-shared-net` + `n8n_n8n-net`

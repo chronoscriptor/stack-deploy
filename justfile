@@ -26,10 +26,10 @@ ps:
 
 state:
     echo "=== Docker ===" && docker ps --format 'table {{ '{{' }}.Names{{ '}}' }}\t{{ '{{' }}.Status{{ '}}' }}\t{{ '{{' }}.Ports{{ '}}' }}'
-    echo "=== Disk ===" && du -sh /home/steven/projects/agent-stack/
+    echo "=== Disk ===" && du -sh $(pwd)/
 
 tree:
-    find /home/steven/projects/agent-stack -maxdepth 4 -not -path '*/\.*' -not -path '*/node_modules/*' | head -60
+    find $(pwd) -maxdepth 4 -not -path '*/\.*' -not -path '*/node_modules/*' | head -60
 
 # Future:
 # morning-brief:   run morning brief workflow via n8n API
