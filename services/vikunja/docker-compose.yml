@@ -1,0 +1,39 @@
+# Vikunja — task management (self-hosted)
+# Connects to shared Postgres + Redis via agent-shared-net.
+
+name: agent-stack-default-vikunja
+
+services:
+  vikunja:
+    image: vikunja/vikunja:latest
+    container_name: agent-default-vikunja
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3456:3456"
+    environment:
+      VIKUNJA_DATABASE_TYPE: ${VIKUNJA_DATABASE_TYPE}
+      VIKUNJA_DATABASE_HOST: ${VIKUNJA_DATABASE_HOST}
+      VIKUNJA_DATABASE_PORT: ${VIKUNJA_DATABASE_PORT}
+      VIKUNJA_DATABASE_USER: ${VIKUNJA_DATABASE_USER}
+      VIKUNJA_DATABASE_PASSWORD: ${VIKUNJA_DATABASE_PASSWORD}
+      VIKUNJA_DATABASE_DATABASE: ${VIKUNJA_DATABASE_DATABASE}
+      VIKUNJA_REDIS_ENABLED: ${VIKUNJA_REDIS_ENABLED}
+      VIKUNJA_REDIS_HOST: ${VIKUNJA_REDIS_HOST}
+      VIKUNJA_SERVICE_SECRET: ${VIKUNJA_SERVICE_SECRET}
+      VIKUNJA_SERVICE_REGISTRATIONTOKEN: ${VIKUNJA_SERVICE_REGISTRATIONTOKEN}
+      VIKUNJA_SERVICE_ENABLEREGISTRATION: ${VIKUNJA_SERVICE_ENABLEREGISTRATION}
+      VIKUNJA_SERVICE_PUBLICURL: ${VIKUNJA_SERVICE_PUBLICURL}
+      VIKUNJA_SERVICE_TIMEZONE: ${VIKUNJA_SERVICE_TIMEZONE}
+    volumes:
+      - agent-default-vikunja-data:/app/vikunja/files
+    mem_limit: 512m
+    networks:
+      - agent-shared-net
+
+volumes:
+  agent-default-vikunja-data:
+
+networks:
+  agent-shared-net:
+    external: true
+    name: agent-shared-net

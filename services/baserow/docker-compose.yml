@@ -1,0 +1,32 @@
+name: agent-stack-default-baserow
+
+services:
+  baserow:
+    image: baserow/baserow:latest
+    container_name: agent-default-baserow
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3004:3000"
+    environment:
+      BASEROW_DATABASE_HOST: ${BASEROW_DB_HOST}
+      BASEROW_DATABASE_PORT: ${BASEROW_DB_PORT}
+      BASEROW_DATABASE_USER: ${BASEROW_DB_USER}
+      BASEROW_DATABASE_PASSWORD: ${BASEROW_DB_PASSWORD}
+      BASEROW_DATABASE_NAME: ${BASEROW_DB_NAME}
+      BASEROW_SECRET_KEY: ${BASEROW_SECRET_KEY}
+      BASEROW_REDIS_HOST: ${BASEROW_REDIS_HOST}
+      BASEROW_REDIS_PORT: ${BASEROW_REDIS_PORT}
+      BASEROW_PUBLIC_URL: ${BASEROW_PUBLIC_URL}
+    volumes:
+      - agent-default-baserow-data:/baserow/data
+    mem_limit: 1g
+    networks:
+      - agent-shared-net
+
+volumes:
+  agent-default-baserow-data:
+
+networks:
+  agent-shared-net:
+    external: true
+    name: agent-shared-net

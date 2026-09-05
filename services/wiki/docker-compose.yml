@@ -1,0 +1,31 @@
+name: agent-stack-default-wiki
+
+services:
+  wiki:
+    image: ghcr.io/requarks/wiki:latest
+    container_name: agent-default-wiki
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3002:3000"
+    environment:
+      DB_TYPE: postgres
+      DB_HOST: ${WIKI_DB_HOST}
+      DB_PORT: ${WIKI_DB_PORT}
+      DB_USER: ${WIKI_DB_USER}
+      DB_PASS: ${WIKI_DB_PASSWORD}
+      DB_NAME: ${WIKI_DB_NAME}
+      HA_SECRET: ${WIKI_SECRET}
+      BIND_ADDR: "0.0.0.0:3000"
+    volumes:
+      - agent-default-wiki-data:/wiki/uploads
+    mem_limit: 256m
+    networks:
+      - agent-shared-net
+
+volumes:
+  agent-default-wiki-data:
+
+networks:
+  agent-shared-net:
+    external: true
+    name: agent-shared-net

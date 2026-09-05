@@ -1,0 +1,68 @@
+# EspoCRM — self-hosted, AGPLv3, 100% free
+# Deployed per-profile under profiles/<name>/services/crm/
+# Joins agent-shared-net so n8n can reach it directly
+#
+# IMPORTANT: Do NOT mount /var/www/html directly.
+# Mount only the subdirectories: custom, data, client/custom.
+
+name: agent-default-crm
+
+services:
+  espocrm:
+    image: espocrm/espocrm:latest
+    container_name: agent-default-crm
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3001:80"
+    environment:
+      - ESPOCRM_DATABASE_HOST=agent-default-crm-db
+      - ESPOCRM_DATABASE_USER=${CRM_DB_USER:-espocrm}
+      - ESPOCRM_DATABASE_PASSWORD=${CRM_DB_PASSWORD:?}
+      - ESPOCRM_DATABASE_NAME=${CRM_DB_NAME:-espocrm}
+      - ESPOCRM_SITE_URL=http://127.0.0.1:3001
+      - ESPOCRM_ADMIN_USERNAME=${CRM_ADMIN_USER:-admin}
+      - ESPOCRM_ADMIN_PASSWORD=${CRM_ADMIN_PASSWORD:?}
+    volumes:
+      - agent-default-crm-data:/var/www/html/data
+      - agent-default-crm-custom:/var/www/html/custom
+      - agent-default-crm-client-custom:/var/www/html/client/custom
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:80/api/v1/health | grep -q 200 || curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:80 | grep -q -e 200 -e 401 -e 302"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
+      start_period: 60s
+    mem_limit: 512m
+    networks:
+      - agent-shared-net
+
+  espocrm-db:
+    image: mariadb:10.11
+    container_name: agent-default-crm-db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${CRM_DB_ROOT_PASSWORD:?}
+      - MYSQL_DATABASE=${CRM_DB_NAME:-espocrm}
+      - MYSQL_USER=${CRM_DB_USER:-espocrm}
+      - MYSQL_PASSWORD=${CRM_DB_PASSWORD:?}
+    volumes:
+      - agent-default-crm-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p${CRM_DB_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    mem_limit: 1g
+    networks:
+      - agent-shared-net
+
+volumes:
+  agent-default-crm-data:
+  agent-default-crm-custom:
+  agent-default-crm-client-custom:
+  agent-default-crm-db-data:
+
+networks:
+  agent-shared-net:
+    external: true
+    name: agent-shared-net

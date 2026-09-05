@@ -1,0 +1,44 @@
+name: agent-stack-default-gitea
+
+services:
+  gitea:
+    image: gitea/gitea:latest
+    container_name: agent-default-gitea
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3003:3000"
+      - "127.0.0.1:3022:22"
+    environment:
+      USER_UID: 1000
+      USER_GID: 1000
+      GITEA__database__DB_TYPE: postgres
+      GITEA__database__HOST: ${GITEA_DB_HOST}:${GITEA_DB_PORT}
+      GITEA__database__NAME: ${GITEA_DB_NAME}
+      GITEA__database__USER: ${GITEA_DB_USER}
+      GITEA__database__PASSWD: ${GITEA_DB_PASSWORD}
+      GITEA__security__SECRET_KEY: ${GITEA_SECRET_KEY}
+      GITEA__security__INTERNAL_TOKEN: ${GITEA_INTERNAL_SECRET}
+      GITEA__security__JWT_SECRET: ${GITEA_JWT_SECRET}
+      GITEA__server__DOMAIN: ${GITEA_DOMAIN}
+      GITEA__server__ROOT_URL: ${GITEA_ROOT_URL}
+      GITEA__server__SSH_DOMAIN: ${GITEA_SSH_DOMAIN}
+      GITEA__server__SSH_PORT: ${GITEA_SSH_PORT}
+      GITEA__server__HTTP_PORT: "3000"
+      GITEA__server__DISABLE_SSH: "false"
+      GITEA__server__START_SSH_SERVER: "true"
+      GITEA__server__OFFLINE_MODE: "true"
+    volumes:
+      - agent-default-gitea-data:/data
+      - agent-default-gitea-repos:/data/git/repositories
+    mem_limit: 512m
+    networks:
+      - agent-shared-net
+
+volumes:
+  agent-default-gitea-data:
+  agent-default-gitea-repos:
+
+networks:
+  agent-shared-net:
+    external: true
+    name: agent-shared-net

@@ -1,0 +1,48 @@
+# Shared infrastructure — one Postgres, one Redis, one reverse proxy.
+# All profiles connect to this via `agent-shared-net`.
+
+name: agent-stack-shared
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: agent-shared-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-agent}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+      POSTGRES_DB: ${POSTGRES_DB:-agent_stack}
+    volumes:
+      - agent-shared-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-agent} -d ${POSTGRES_DB:-agent_stack}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    mem_limit: 2g
+    networks:
+      - agent-shared-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: agent-shared-redis
+    restart: unless-stopped
+    volumes:
+      - agent-shared-redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    mem_limit: 512m
+    networks:
+      - agent-shared-net
+
+volumes:
+  agent-shared-postgres:
+  agent-shared-redis:
+
+networks:
+  agent-shared-net:
+    external: true
+    name: agent-shared-net

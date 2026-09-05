@@ -1,0 +1,48 @@
+name: agent-stack-default-plane
+
+services:
+  backend:
+    image: makeplane/plane-backend:latest
+    container_name: agent-default-plane-backend
+    restart: unless-stopped
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py # skip
+             python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "127.0.0.1:8081:8000"
+    environment:
+      DATABASE_URL: ${PLANE_DB_URL}
+      REDIS_URL: ${PLANE_REDIS_URL}
+      SECRET_KEY: ${PLANE_SECRET_KEY}
+      ADMIN_TOKEN: ${PLANE_ADMIN_TOKEN}
+      WEB_URL: ${PLANE_WEB_URL}
+      PORT: ${PLANE_PORT}
+    volumes:
+      - agent-default-plane-data:/data
+    depends_on:
+      - frontend
+    mem_limit: 1g
+    networks:
+      - agent-shared-net
+
+  frontend:
+    image: makeplane/plane-frontend:latest
+    container_name: agent-default-plane-frontend
+    restart: unless-stopped
+    command: node web/server.js
+    ports:
+      - "127.0.0.1:8082:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://127.0.0.1:8081
+    mem_limit: 256m
+    networks:
+      - agent-shared-net
+
+volumes:
+  agent-default-plane-data:
+
+networks:
+  agent-shared-net:
+    external: true
+    name: agent-shared-net

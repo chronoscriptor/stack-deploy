@@ -1,0 +1,34 @@
+name: agent-stack-default-mattermost
+
+services:
+  mattermost:
+    image: mattermost/mattermost-team-edition:latest
+    container_name: agent-default-mattermost
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8065:8065"
+    environment:
+      MM_SQLSETTINGS_DATASOURCE: postgres://${MM_DB_USER}:${MM_DB_PASSWORD}@${MM_DB_HOST}:${MM_DB_PORT}/${MM_DB_NAME}?sslmode=disable
+      MM_SERVICESETTINGS_SITEURL: ${MM_SITE_URL}
+      MM_SERVICESETTINGS_ENABLEOAUTHSERVICE: "false"
+      MM_EMAILSETTINGS_ENABLESIGNUPWITHEMAIL: "true"
+      MM_EMAILSETTINGS_SENDEMAILNOTIFICATIONS: "false"
+      MM_SERVICESETTINGS_ENABLECOMMUNITY: "false"
+      MM_PLUGINSETTINGS_AUTOMATICPREPACKAGEDPLUGINS: "false"
+    volumes:
+      - agent-default-mattermost-config:/mattermost/config
+      - agent-default-mattermost-data:/mattermost/data
+      - agent-default-mattermost-logs:/mattermost/logs
+    mem_limit: 512m
+    networks:
+      - agent-shared-net
+
+volumes:
+  agent-default-mattermost-config:
+  agent-default-mattermost-data:
+  agent-default-mattermost-logs:
+
+networks:
+  agent-shared-net:
+    external: true
+    name: agent-shared-net

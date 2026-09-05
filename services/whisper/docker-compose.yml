@@ -1,0 +1,26 @@
+name: agent-stack-default-whisper
+
+services:
+  whisper:
+    image: onerahmet/openai-whisper-asr-webservice:latest
+    container_name: agent-default-whisper
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8866:9000"
+    environment:
+      ASR_MODEL: ${WHISPER_MODEL:-base}
+      ASR_LANG: ${WHISPER_LANG:-en}
+      ASR_JSON_RESPONSE: ${WHISPER_JSON_RESPONSE:-true}
+    volumes:
+      - agent-default-whisper-models:/root/.cache/whisper
+    mem_limit: 2g
+    networks:
+      - agent-shared-net
+
+volumes:
+  agent-default-whisper-models:
+
+networks:
+  agent-shared-net:
+    external: true
+    name: agent-shared-net

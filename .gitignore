@@ -1,0 +1,6 @@
+# .gitignore
+.env
+*.log
+node_modules/
+secrets/
+.vault/
